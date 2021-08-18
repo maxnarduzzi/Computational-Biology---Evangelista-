@@ -1,0 +1,206 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+#****COMPUTATIONAL ECOLOGY PART 1: ESTIMATING SPECIES RICHNESS****
+
+### **Adelphi University - Computational Biology Prof. Dominic Evangelista**
+
+## ***Part 1: Evenness patterns***
+
+Species diversity has two components: evenness and richness. Evenness describes how balanced the abundance of each species is. Richness describes how many species there are. 
+
+Why is species richness something that requires computational tools? Shouldn't we easily be able to tell how many species there are in an area?
+
+Let's take a look at some real-world data to see why this might be the case.
+
+NOTE: This is a useful tool for finding preloaded datasets in R : https://vincentarelbundock.github.io/Rdatasets/articles/data.html
+
+```{r}
+```
+
+This is a table containing the distribution of species abundances. The first column represents the abundance of a species and the second column lists how many species had that abundance. Let's plot a histogram of the data.
+
+```{r}
+```
+SIDE NOTE: We're going to have to make a lot of histograms in this workbook so I suggest you make a shortcut function that will make it easier to plot a histogram. Your function should plot the frequency as a fraction of the total number of species.
+
+```{r}
+```
+The histogram shows us how common it is for the butterfly species in the dataset to have different abundances. Apparently, its very common for a species to be rare and rare for a species to be common. Look at the data itself to see what I mean.
+
+```{r}
+```
+62% of all butterfly SPECIES had less than 10 individuals found.
+```{r}
+```
+In the whole dataset, 51% of all butterfly INDIVIDUALS collected were just from the 4 most abundant species. 
+
+>The majority of species are have are rare, but the majority of individuals are from common species.
+
+This is actually a pattern universal in ecology.
+
+It's also the same for the cottontail dataset and the insect dataset in the SPECIES package. Try it yourself below.
+
+```{r}
+```
+
+
+This is the property "evenness". In general, ecological communities are very uneven. The reasons why are not always known but it probably often has to do with both sampling bias and actual ecological patterns.
+
+Why is low evenness important when our question is about species richness?
+
+## ***Part 2: Fitting distributions to richness data SKIP***
+### ****Types of distributions****
+
+Here's a hint to the previous question...it can tell us something about if we have found all the species in a particular area or not. Let's explore this by first asking a simple question about our data...
+
+>What would our dataset look like if we had infinite (or near infinite) sampling strength?
+
+If the pattern mentioned above (most species are rare) has something to do with biology and not ONLY sampling then it should still be there when we sample the entire population of every species.
+
+Lets see if we can find a generalized equation to describe species diversity distributions. There are three different types of distributions that are potential candidates for best fitting the species diversity distribution: poisson distribution, binomial distribution, and geometric distribution.
+
+The poisson distribution. It has one parameter: lambda (equal to the sample mean). Plot the histogram of this distribution. See what happens when you adjust lambda values. Settle on a lamdba equal to the mean of the butterfly data (since that is the data we're going to fit our distribution to).
+```{r}
+```
+The binomial distribution. It has two parameters: the number of trials (size) and the probability of success each trial. Based on these parameters you can already see that it may not be a good fit for our data. Our data are not success/fail trials, they are species abundances. However, we could reinterpret our data to say that every time we collect an individual it is a "success" if it is a species we haven't collected before. 
+
+Plot the histogram of the binomial distribution below. See what happens when you adjust parameter values. Don't worry about setting the parameters appropriately yet, we'll try that later.
+```{r}
+```
+The geometric distribution. It has one parameter: the probability of success each trial. This is similar to the binomial distribution. 
+
+Plot the histogram of the binomial geometric below. See what happens when you adjust parameter values. Don't worry about setting the parameters appropriately yet, we'll try that later.
+
+```{r}
+```
+### ****Estimating parameters of the distributions****
+Poisson distribution. We did this above but lets replicate it here. We need to estimate the mean of the distribution.
+
+```{r}
+```
+
+Binomial distribution. As stated above, we need to reinterpret our data to say that every time we collect an individual it is a "success" if it is a species we haven't collected before. We can do this using a randomization algorithm. Code this below.
+    Explanation: We want to simulate the process of sampling an ecological community based on the butterfly data we have. Every time we sample an individual we will record if it is a success (adding a new species to our total list) or a failure (repeatedly sampling the same species). Then we can take the mean number of successes for a given trial and that will be our success probability. Already, you might be able to see that this is going to be largely affected by the ratio of richness to abundance (i.e. EVENNESS!).
+    
+    
+```{r}
+```
+```{r}
+```
+```{r}
+```
+### ****Determining the best fit to the distributions****
+
+
+```{r}
+```
+From looking, it clearly looks like the geometric distribution fits the data best. We can test this more formally by doing a Quantile-Quantile plot (qqplot) and quantify the deviation from 1:1.
+
+```{r}
+```
+
+The R-squared values give the % of variance explained by the model. The one with the highest R-squared is the one where the model fit best.
+
+
+
+## ***Part 3: Calculating total species richness using the WRONG model -- SKIP***
+
+>Geometric Distribution
+Assume Bernoulli trials — that is, (1) there are two possible outcomes, (2) the trials are independent, and (3) , the probability of success, remains the same from trial to trial. Let's  denote the number of trials until the first success. Then, the probability mass function of  is: f(x) = P(X=x) = p((1-p)^(x-1))   
+for x = 1, 2, ... In this case, we say that X follows a geometric distribution.
+
+Now we have a generalized model (the distribution) that we think describes the pattern of species richness. What's even better is that the parameters of the model make sense given the way we sample for species in ecological communities. We can thus use this model to estimate how many species an idealized sample would contain. What do we mean by idealized sample? A sample that contains no observer bias.
+
+
+```{r}
+```
+Using this method it seems that there are between 78 and 71 species total but our data have 620 species. Why is this?
+
+Perhaps the exponential distribution is good as a model for the richness of rare species but it severely under estimates moderate and common species?
+
+Let's try something else to see if this model is realistic. Let's make prediction based on some logic. If we have a patch with finite area there will be a finite number of individuals and species in that area because the resources will be limited. Therefore, as we continue to sample that area our estimate of species richness should converge on a specific value, and not go off to infinity.
+
+```{r}
+```
+It looks like this model is incorrect, as it does not follow the basic rules of how we think about species accumulation curves. 
+
+Although this model seemed to fit the data well (interpolation) it did not do a good job at generating biologically realistic predictions (extrapolation).
+
+
+## ***Part 4: Calculating total species richness using an appropriate model -- SKIP***
+We are down to two models now: poisson and binomial. Perhaps we can do a better job of estimating one of our parameters. NOTE: FIX THIS
+```{r}
+```
+Obviously its not a very smooth data but one thing in particular stands out. There are more species with abundances of 25 than 20, which is an exception to the trend in the remainder of the plot. This is because (I think) they have lumped all species with abundances greater than 25 into one category, creating an aberration, or an outlier. Outliers tend to unfairly influence the mean. When we have outliers the MEDIAN may actually better approximate the center of a distribution than the mean. As such, we can update lambda.
+
+```{r}
+```
+Now recalculate the distribution
+
+```{r}
+```
+Perhaps the poisson distribution fits better now that we have adjusted for outliers.
+
+Let's redo our simulation and see if it converges on a single value or at least decreases so slowly that it effectively is converging.
+
+
+```{r}
+```
+It does seem to behave better but the total number of species is still entirely off.
+
+```{r}
+```
+We estimated (with 95% confidence) that the number of species of butterflies in our data is probably between 24 and 19. The number of species we actually had was 25. But remember that we corrected for the outliers by using the median instead of the mean. It made our model fit the data better but it isn't representative of what our data actually show, so our estimate is off slightly. One way we could fix this is by using the mean (as intended) but log-transform the data. 
+
+Instead, let's just move on to finally using this distribution to estimate the total number of species in our community if we had MAXIMAL SAMPLING STRENGTH.
+
+```{r}
+```
+Using this method we have estimated that there are 31-34 species, but because we know that our original estimate was a little too low we might expect this new estimate to be at the upper end of this range or slightly higher.
+
+## ***Part 5: Calculating total species richness using data randomization***
+We see above that estimating species richness is difficult with a model because it relies on assumptions of the models and the vulnerabilities of model selection. The geometric distribution fit the data well but was bad at extrapolating the species richness realistically. The Poisson distribution fit the data poorly but only because the data were messy...and even once we corrected for this it still wasn't entirely robust.
+
+These are great reasons why parametric statistics (distributions have parameters) is flawed. However, there is a whole field of statistical inference that avoids parameters: NON-parametric statistics.
+
+The non-parametric method we will explore is a randomized resampling test: boostrapping
+
+Explanations
+    - Bootstrapping: comes from the phrase "pull yourself up by your bootstraps". In this context it means something like "if you want to estimate something about your data and you have nothing else (no model, no parameters) you can estimate it by pulling your data up by its own bootstraps". It involves randomly resampling a portion of your data and then comparing the resampling trials against your original dataset to make inferences.
+    - Jackknifing: don't know why it's called jack-knifing but it's essentially the same as bootstrapping but it involves randomly removing a single datapoint many times to see how your dataset changes.
+    
+    The key differences between these two method is: bootstrapping samples a percentage of your data and jackknifing samples all of your data except one data point.
+#*Bootstrapping to estimate species richness*
+
+Let's look back (above) at our recreation of the data in the form of the object "community". If we assume that the abundances of the species (numbers) in this list are proportional to the abundances of species in the real world community where they were collected from then we can estimate total species richness that way.
+
+Let's say, for example, that we know our data was collected by sampling 10% of the trails in a particular park. Assume our data is a representative sample. If we collected over the remaining 90% of area would should be able to find most of the remaining individuals, right? But we simply don't know if the remaining 90% of individuals accounts for 0 additional species or 10 additional species. However, we can estimate this through bootstrapping because of the assumption mentioned in the previous paragraph.
+
+Write a script that resamples 10% of the individuals in our dataset and counts how many species are in that 10%. Then subtract that number (the subsample richness) from the observed richness (25 = the number of species in our data) and that is the unsampled richness ( the number of species we are, hypothetically, missing).
+
+Then repeat this an arbitrarily high number of times (e.g., 1000) and take the average of the unsampled richnesses. 
+
+```{r}
+```
+
+So...the total number of species might be...
+
+```{r}
+```
+This estimates that between ~50 and ~310 species are unsampled. The most likely estimate is that there ate 753 total species of butterflies.
+
+## ***Part 6: Comparing methods***
+
+The "SPECIES" library package actually has some premae functions to do what we just did, as well as some other commonly used methods.
+
+"https://bioinfo.stats.northwestern.edu/SPECIES-manual_1.0.pdf"
+
+Below, compare your estimates of species richness in the butterfly community to some other estimates.
+
+```{r}
+```
+All of these estimates are very similar to the estimates we made.

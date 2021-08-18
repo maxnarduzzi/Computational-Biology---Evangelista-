@@ -1,0 +1,357 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code.
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*.
+
+```{r}
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+# INTRODUCTION TO MODELLING: CASE STUDY: MODELLING NUCLEOTIDE EVOLUTION
+
+### *Adelphi University - Computational Biology Prof. Dominic Evangelista*
+
+## Part 1: What is a model?
+
+Models are a representation of a thing in a simplified or idealized form. This definition applies whether we are talking about fashion models, model airplanes, or mathematical models. Fashion models represent what clothes look like in an idealized scenario. However, most fashion models aren't a very useful model. This is because they aren't predictive of the real world. Most people don't look like fashion models. Model airplanes may be more useful. Mathematical models (or evolutionary models, or ecological models) can be as useful or useless as the current science allows.
+
+> "All models are wrong, but some are useful".
+
+This famous quote by George Box (1976) encapsulates a key idea about modelling -- it doesn't matter if a model's components exactly mirror the components in the actual system. As long as the model use useful in a practical sense then it is a good model.
+
+So what makes a model useful? Extrapolation, interpolation and simplicity.
+
+We will see what we mean by these three criteria in action. But before that, let's talk about how to compose a model.
+
+## Part 2: Model composition
+
+Models are composed of parameters and relationships. By combining parameters with relationships, a model can make predictions about data. Models also rely (explicitly or implicitly) on assumptions. If those assumptions are not reasonable, or are flat-out false, then the model may not be useful.
+
+As we said before, models can be anything. Models can be made of images, equations, code, sets of rules (i.e. an algorithm), wood, etc.
+
+Here's one example.
+
+![](accessory%20files/Sat%20image%20model%20example.png){width="664"}
+
+The model (right) simplifies the data into a form that is useful. If you want to know what kind of habitat any particular point on the map is it is simpler to use the model than the original data.
+
+-   Model parameters
+
+    -   Habitat types
+
+        -   Values
+
+            -   Savanna
+
+            -   Flooded shrubland
+
+            -   Flooded forest
+
+            -   Dry forest
+
+            -   Flooded savanna
+
+            -   Open water
+
+-   Model relationships
+
+    -   Relative spatial position or the parameters to one another
+
+Here's another example. This model is probably one you have seen before.
+
+```{r}
+```
+
+```{r}
+```
+
+This is the Hardy-Weinberg model. As represented it will calculate the genotype frequencies when given the frequencies of particular alleles.
+
+-   Model parameters
+
+    -   Allele frequencies
+
+        -   Values
+
+            -   p (allele 1)
+
+            -   q (allele 2)
+
+-   Model relationships
+
+    -   Mathematical relationship of parameters
+
+## Part 3: When is a model useful?
+
+Let's look at one of the built-in datasets in R. The dataset called **lynx.**
+
+```{r}
+```
+
+The data are a sampling of the population sizes of lynx from 1821 to 1934. Let's just look at the data from the first 10 years of the dataset.
+
+```{r}
+```
+
+Now let's make a very simple model using a linear regression also known as a linear "best fit" line.
+
+```{r}
+```
+
+Is this a good model? Let's look at the three criteria for what make a model useful.
+
+### 1. Interpolative value (how good the model is at making predictions about the existing data)
+
+We can visualize this by looking at the residuals between the model and the data.
+
+```{r}
+```
+
+The residuals are small, particularly in the first years of the model. Compare this to residuals between the data and a randomized model.
+
+```{r}
+```
+
+In the above plot the circles represent the residuals for the data under the estimated model and the stars are the residuals for the data under a randomized model. This will change every time we run the code because it does a random permutation every time, so sometimes it might be better than others. However, most of the time we will see that the values on the right are generally further from 0 (perfect fit) than the values on the left.
+
+### 2. Extrapolative value (how good the data are at making predictions about data outside the range of the original)
+
+The lynx dataset has population data for over 100 years, so we can see how our model does at predicting the population values after year number 10.
+
+```{r}
+```
+
+The deviation from the 1:1 line in the above plot demonstrates the poor fit. For reference, if it was a perfect fit the plot would look like the one below.
+
+```{r}
+```
+
+We could also visualize it like this
+
+```{r}
+```
+
+The values of the first 10 years fit the line (because that's the data that was used to estimate the line) but the more recent values don't fit at all.
+
+This model isn't very useful then. It's somewhat useful for predicting the population size over the first decade but not after that.
+
+How to find a solution? We COULD make a new linear model using more data (20 years versus 10). What happens then?
+
+```{r}
+```
+
+By trying to make our model better at extrapolation, it has now become worse at interpolation. This is not a good solution to our problem, because the model is still not useful.
+
+The only way to solve this issue is to make the model more complex. This means we cannot make it a straight line, but will have to use some other algebraic function.
+
+```{r}
+```
+
+This works a little better but you might see a few problems with this.
+
+First, it clearly won't be very good for extrapolation.
+
+```{r}
+```
+
+Second, the model is complicated in a way that may not be justified by the data. In fact, you could just increase the degree of the polynomial to continually improve the fit of the model to the data. This means we could force the function to fit the existing data perfectly.
+
+Third, the equation is not biologically meaningful. There is nothing about the best-fit model that matches the way population size changes over time. In this case, a biologically meaningful model would utilize data on lynx as well as their prey species to predict future population sizes.
+
+(Side-note: here is a little background on the biologically meaningful model that could be used to model this data: <https://services.math.duke.edu/education/webfeats/Word2HTML/Predator.html>)
+
+### 3. Model simplicity
+
+> "Everything should Be made as simple as possible, but not simpler".
+
+This quote by Albert Einstein encapsulates the idea of simplicity in modelling. If there is something in the natural work that justifies the inclusion of a parameter in a model, then we should include it as a parameter. Maybe we think that other things should be included as paramaters, but if it isn't justified based on the data then the model might be overly complex. This is called "over parameterization". Like in the example above, we can over parameterize a model to make its fit infinitely good, but this can make the model incongruous with nature.
+
+## Part 4: Model of nucleotide evolution
+
+Let's move on to a case study.
+
+Question: Given a dataset of homologous DNA sequences among multiple species, can we model the changes in the DNA sequences that lead to the existing genetic diversity?
+
+More simply put: can we reconstruct the evolutionary history of genes?
+
+library(ape);
+
+library(seqinr)
+
+```{r}
+```
+
+These are four homologous regions of a protein-coding mitochondrial gene in four organisms. You can see that the four sequences are very different from one another. Therefore, over the hundreds of millions of years that have passed since these organisms' common ancestor, many mutations have accumulated.
+
+Let's just look at the first few codons
+
+```{r}
+```
+
+This segment shows a familiar pattern: third codon positions are highly variable, second codon positions are highly conserved and first codon positions are intermediate.
+
+Let's take a look at the familiar "universal genetic code table": <https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/3206/2018/05/03183551/Figure_15_02_05.png>
+
+Certainly you've seen this table before, but have you thought about (or been taught) why it is the way it is? For instance, the redundancy of the genetic code follows certain patterns. For instance, a mutation from a pyrimidine to a pyrimidine is more likely to cause a phenotypic change (a change in amino acid) than a switch from a purine to a purine. Also, we need to think about the chemical properties of the amino-acids. More similar amino acids have similar genetic coding. For example: switching from AAA to AGA changes from a lysine to an arginine. The single change is a purine switching the other purine (a change that is less likely to be caught by proofreading proteins, which means it's a more frequent mutation). Similarly, lysine and arginine are both positively charged and have hydrophilic properties. Thus the mutation is less likely to have large effects on protein functioning than other mutations. When mutations have little effect on phenotype (i.e., they are close to neutral) they are observed more frequently because they don't experience selection. (see more here: <https://www.thermofisher.com/us/en/home/life-science/protein-biology/protein-biology-learning-center/protein-biology-resource-library/pierce-protein-methods/amino-acid-physical-properties.html>)
+
+The details here are not so important but the general scheme is. We can estimate the frequency of certain substitutions by incorporating these kinds of parameters into a model of sequence evolution.
+
+### 1. The simplest model of DNA evolution
+
+The simplest model would be one that makes no assumptions about how certain bases behave. Therefore, the simplest model has a single parameter: the substitution frequency.
+
+This model will then take the form of a matrix, where each value in the matrix represents the probabilty of substituting one nucleotide with another (or substituting one nucleotide with itself).
+
+```{r}
+```
+
+This model actually has a name. It is called "JC69" which is short for Jukes and Cantor (1969). (Jukes TH, Cantor CR (1969). Evolution of Protein Molecules. New York: Academic Press. pp. 21--132.)
+
+### 2. A 2-parameter model of DNA evolution
+
+We can reuse the model above and add a parameter to make the model slightly more complex but still biologically plausible. The easiest way to do this would be to use a different substitution rate for transitions and transversions.
+
+In the code block below, see if you can create a matrix, similar to the one above, but with different rates for transitions and transversions.
+
+```{r}
+```
+
+After you are done ask Dominic how you might check your work.
+
+We could go on and add more parameters to make this kind of model more complex based on our understanding of how mutation, genetics, and evolution operates. You can see sopme more models of evolution and their description here - <http://science.umd.edu/labs/delwiche/bsci348s/lec/NTSeqEvol.html> As well as these descriptions of nucleotide substitution models - <http://evomics.org/resources/substitution-models/nucleotide-substitution-models/>
+
+### 3. Incorporating information about codon structure
+
+Above, we mentioned that mutations happen at different rates along a strand of DNA. In practice, there are numerous ways we could incorporate this dynamic into a model of gene evolution. The ways other people have done it are: binning individual nucleotides by their substitution rate and estimating the rate of the whole bin (site specific partitioning); using a model that treats each codon position differently (a model of codon evolution); or assuming that the rates follow a gamma distribution shape and drawing estimating them using the distribution (gamma rate model).
+
+Pick one of these methods (or another one that makes sense to you) and write some code for interpreting the above segment of DNA alignment using codon structure.
+
+```{r}
+```
+
+### 4. Putting models into practice: Phylogeny estimation
+
+NOTE: Do not do this part until Dominic has lectured on types of probability.
+
+The following case-study is taken (and modified) from: https://cran.r-project.org/web/packages/phangorn/vignettes/Trees.html
+
+
+#### *Introduction*
+These notes should enable the user to estimate phylogenetic trees from alignment data with different methods using the phangorn package (Schliep 2011) . Several functions of package are also described in more detail in (Paradis 2012). For more theoretical background on all the methods see e.g. (Felsenstein 2004)(Yang 2006). This document illustrates some of the package features to estimate phylogenetic trees using different reconstruction methods. Small adaptations to the scripts in section @ref(appendix) should enable the user to perform phylogenetic analyses.
+
+#### *Getting started*
+The first thing we have to do is to read in an alignment. Unfortunately there exists many different file formats that alignments can be stored in. The function read.phyDat is used to read in an alignment. There are several functions to read in alignments depending on the format of the data set (“nexus,” “phylip,” “fasta”) and the kind of data (amino acid or nucleotides) in the ape package (Paradis and Schliep 2019) and phangorn. The function read.phyDat calls these other functions and transform them into a phyDat object. For the specific parameter settings available look in the help files of the function read.dna (for phylip, fasta, clustal format), read.nexus.data for nexus files. For amino acid data additional read.aa is called.
+
+We start our analysis loading the phangorn package and then reading in an alignment.
+
+```{r}
+```
+
+#### *Distance based methods*
+After reading in the alignment we can build a first tree with distance based methods. The function dist.dna from the ape package computes distances for many DNA substitution models. To use the function dist.dna we have to transform the data to class DNAbin. For amino acids the function dist.ml offers common substitution models (for example “WAG,” “JTT,” “LG,” “Dayhoff,” “cpREV,” “mtmam,” “mtArt,” “MtZoa” or “mtREV24”).
+
+After constructing a distance matrix we reconstruct a rooted tree with UPGMA and alternatively an unrooted tree using Neighbor Joining (Saitou and Nei 1987)(Studier and Keppler 1988). More distance methods like fastme are available in the ape package.
+
+
+```{r}
+```
+
+Rerun the code above with different evolutionary models and see how it affects the tree. Does it change the close relationships of the apes? What about other parts of the tree? Write your answer below.
+
+
+#### *Parsimony*
+
+The function parsimony returns the parsimony score, that is the number of changes which are at least necessary to describe the data for a given tree. We can compare the parsimony score or the two trees we computed so far:
+```{r}
+```
+
+The function optim.parsimony performs tree rearrangements to find trees with a lower parsimony score. The tree rearrangement implemented are nearest-neighbor interchanges (NNI) and subtree pruning and regrafting (SPR). The later one only works so far with the fitch algorithm.
+
+```{r}
+```
+However is also a version of the parsimony ratchet (Nixon 1999) implemented, which is likely to find better trees than just doing NNI / SPR rearrangements. The current implementation is...
+
+    -Create a bootstrap data set Db from the original data set.
+    -Take the current best tree and perform tree rearrangements on Db and save bootstrap tree as Tb.
+    -Use Tb and perform tree rearrangements on the original data set. If this trees has a lower parsimony score than the currently best tree replace it.
+    -Iterate the previous steps until either a given number of iteration is reached or no improvements have been recorded for a number of iterations.
+
+```{r}
+```
+
+Next we assign branch length to the tree. The branch length are proportional to the number of substitutions / site.
+
+```{r}
+```
+What is parsimony and how does it compare to the distance based methods? Does it use an evolutionary model? Does it use any other kind of model? If not, how does it relate to modelling?
+
+#### *Maximum likelihood*
+
+The last method we will describe in this vignette is Maximum Likelihood (ML) as introduced by Felsenstein (Felsenstein 1981). We can easily compute the likelihood for a tree given the data
+
+
+```{r}
+```
+
+
+The function pml returns an object of class pml. This object contains the data, the tree and many different parameters of the model like the likelihood. There are many generic functions for the class pml available, which allow the handling of these objects.
+
+
+```{r}
+```
+
+The object fit just estimated the likelihood for the tree it got supplied, but the branch length are not optimized for the Jukes-Cantor model yet, which can be done with the function optim.pml.
+
+```{r}
+```
+
+Find the help documentation for optim.pml()
+
+```{r}
+```
+
+Now, try optimizing the tree's branch lengths again using a more complicated model.
+
+With the default values pml will estimate a Jukes-Cantor model. The generic function update allows to change parameters. We will change the model to the GTR + Γ(4) + I model and then optimize all the parameters.
+
+```{r}
+```
+
+With the control parameters the thresholds for the fitting process can be changed. Here we want just to suppress output during the fitting process. For larger trees the NNI rearrangements often get stuck in a local maximum. We added two stochastic algorithms to improve topology search. The first (set rearrangement="stochastic") performs stochastic rearrangements similar to (Nguyen et al. 2015), which makes random NNI permutation to the tree, which than gets optimized to escape local optima. The second option (rearrangement=“ratchet”) perform the likelihood ratchet (Vos 2003).
+
+While these algorithms may find better trees they will also take more time.
+
+```{r}
+```
+
+Is maximum Maximum likelihood a model? If yes, how does it relate to JC69 and the other evolutionary models we've talked about in this notebook? If MLis not a model, then how does it relate to modelling? 
+
+
+#### *Model selection*
+
+We can compare nested models for the JC69 and GTR + Γ(4) + I model using likelihood ratio statistic, with the Shimodaira-Hasegawa test, or with the AIC.
+
+```{r}
+```
+
+What do the results tell you? How can they be interpreted?
+
+
+
+
+
+
+
+
+# END
+```
+CONGRATULATIONS! YOU'RE DONE WITH MODELLING...FOR NOW!

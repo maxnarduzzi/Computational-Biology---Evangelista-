@@ -1,0 +1,24 @@
+---
+title: "R Basics tutorial"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Visit: https://github.com/stacycalhoun/Intro_to_R_in_Ecology_Resources
+
+On your computer, work through the notebook entitled "Intro to R for Ecology Lab Exercise_Calhoun.R".
+
+You can try skipping over sections that are already familiar to you. What you should focus on is plotting with **ggplot2**. This is a very useful package for more easily making very pretty plots of your data.
+
+If you would still like more practice with R, you can practice with some of these courses:
+
+  * https://github.com/EasyD/IntroToDataScience
+  * https://github.com/biodatascience/compbio_src
+  
+  
+Now visit: https://towardsdatascience.com/a-gentle-introduction-to-regular-expressions-with-r-df5e897ca432
+
+Work through the tutorial on Regex. Regex (regular expressions) are a way of utilizing customized strings to search through text. If you are writing code to search through text databases (like of molecular data) or something more customized like writing code to modify other code documents you will likely need to use Regex. Regex is useful in context outside of R as well (e.g., in text editors, other coding languages, etc.).

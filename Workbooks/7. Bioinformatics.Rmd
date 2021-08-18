@@ -1,0 +1,249 @@
+#****Bioinformatics: Part 1: BLAST
+
+###***Adelphi University - Computational Biology Prof. Dominic Evangelista**
+
+##***Part 1: Unknown sequence identification***
+BLAST is an acronym for Basic Alignment Search Tool. Its function is to search a string against a database. It does so by using alignment scores (it's more complicated than that but if you want more detail see the lecture).
+
+We are going to install an r-based interface for BLAST. This package is available on GitHub. 
+
+https://github.com/mhahsler/rBLAST
+
+R can't natively do this so we need to install a package that will allow us to install from GitHub. Also, rBLAST has a dependancy that we will also need to install. 
+
+```{r}
+```
+
+Once you have installed everything you should be able to get started with BLAST. Here's a practice problem.
+
+###***Problem 1***
+You have sequenced a partial genome of an organism using a technique called "anchored hybrid enrichment". This technique allows you to target hundreds (or thousands) of regions of a genome for an organism. However, the technique is imperfect, so you end up recovering both target and non-target sequences. Also, each sequence is just a string of nucleotides. Whether or not a given string is a target or non-target sequence, you need to figure out the identity of those strings before you can do anything with them.
+
+Go to the NCBI nucleotide archive and search for an unidentifed gene: https://www.ncbi.nlm.nih.gov/nuccore/?term=unknown%5Bgene%5D
+
+After your search look at "Results by taxon" on the right. Click "[Tree]". Then navigate through the taxonomy to pick any organism of your choosing.
+
+Click on the record that you are interested in. Then click "FASTA" to view the record in FASTA format.
+
+Copy and paste the fasta formatted record into a text file and save it somewhere. Load it below.
+
+```{r}
+```
+
+In order to identify this sequence we will need to BLAST it (yes...BLAST is commonly used as a verb) against a database of known sequences. The best way to do this is to make a BLAST database from a complete (or mostly complete) annotated genome of a closely related species.
+
+Visit the NCBI assembly archive: https://www.ncbi.nlm.nih.gov/assembly/
+
+Search for the higher taxon your organism is a part of. For example, if your unknown organism is "Vulpes vulpes" (common fox) then you might search "Carnivora".
+
+Choose a single assembled genome and click on it. Then download the annotated assembly as a protein FASTA formatted file.
+
+Once you extract the file you can view it in a text editor. IMPORTANT: The file will probably be too large for you to view in your default text editor. It definitely will not work in MSWord. You should download and install a text editor that can handle large files (e.g., Notepad++, EditPadLite, SublimeText, TextWrangler, or VIM).
+
+Now, use the functionality of rBLAST to do the following:
+1. Make the genome assembly into a database
+2. Use "blastx" to search your unknown sequence against the database
+3. View the results and describe them (in this file). What do the different statistical values tell you? Can we identify the unknown sequence or not? Is its identity ambiguous in any way?
+4. Hopefully you got some clue to what gene your unknown sequence corresponds to. Find out more about that gene by searching it on the UniProt database (https://www.uniprot.org/). Write a little bit about what that gene does (1 paragraph).
+5. The process you have gone through is the simplest form of annotation. Before moving on to the next section (annotation), write out some ideas about how we could improve the accuracy, precision, or efficiency of this process. Is there a way to improveall three at once or does doing one sacrifice the other? 
+
+
+#****Bioinformatics: Part 2: Genome Annotation
+Now we are going to do something that is simultaaneously easier yet more difficult. The algorithm for annotation is much more complex than what we did in the previous section, but it will be easier for you because will be using a premade, standalone program.
+##***Part 2.1: Preprocessing***
+Return to the NCBI assembly database: 
+Visit the NCBI assembly archive: https://www.ncbi.nlm.nih.gov/assembly/
+
+Choose another assembly database to download the protein assembly in FASTA format. You may have noticed that the assemblies here are (all?) annotated already. That's ok. It will allow us to compare the annotation on NCBI to the EggNOG annotation. NOTE: DO NOT choose an assembly that is very large (more than 400 MB). It will be very difficult for you to process a large assembly.
+
+Now use the functionality in R to do the following (try the packages APE or Bioconductor).
+
+1. Import the protein assembly.
+2. Count how many sequences are in the file. 
+3. If there are more than 100,000 sequences then remove some number of sequences so there is a max of 100k in your file. Export that file.
+
+##***Part 2.2: Uploading to EggNOG mapper***
+Goto: http://eggnog-mapper.embl.de/
+
+Upload your sequences and follow the directions on the website.
+Click "Advanced Options" and "Search Filters". Adjust the values to the following:
+
+Min E-value: 0.00001
+Minimum hit bit-score: 60
+Percentage identity: 35
+Minimum % of query coverage: 50
+Minimum % of subject coverage: 20
+
+Now click Click "Annotation Options". Explore the first two options (Taxonomic Scope and Orthology restrictions) but don't change anything here. 
+
+Click submit. Sometime day (or maybe tomorrow) you will get an email saying that your results are ready to download.
+
+While you're waiting, answer these questions.
+
+1. For each of the "search filters" we modified, what is the expected effect on the search process? Which changes will make the search more restrictive and which ones will make the search more inclusive? Do you agree with each of the changes? Why or why not?
+
+2. What is one-to-one orthology and how would changing this option affect the results?
+
+3. Under what conditions would we change the "taxonomic scope" option? Under what situations is it better to use the "Auto" option here?
+
+##***Part 2.3: Analyzing your results***
+
+Examine your output files in your text editor (the one that can handle large files). Look at this page if you can't understand the output format. https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.2-to-v2.1.4
+
+Use R to do the following. 
+1. Compare the number of annotated sequences output from eggNOG to the original file you downloaded from NCBI (if you recall, your original file was /probably/ already annotated).
+2. Choose 5 arbitrary sequences from your eggNOG output. BLAST them: https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastp&PAGE_TYPE=BlastSearch&LINK_LOC=blasthome
+
+Compare the results of EggNOG, BLAST and the original annotations. Do they all give the same predicted gene output? 
+
+Answer the following questions:
+
+1. Does the original sequence file say how it was annotated (look on the original page on NCBI)?
+2. Evaluate the efficacy of each of the three methods used to annotated the genome (eggNOG, BLAST and the original one...even if you don't know what it is). What are the strengths and weaknesses of each? Which one would you use if you sequenced a new, unknown genome?
+
+
+
+
+
+#****Bioinformatics: Part 3: Phylogenetic pipeline
+Everything we have done prior to this are also commonly part of phylogenetic (and phylogenOMic) pipelines. They are the intial steps that confirm our basic assumption: that the data se are analyzing are homologous (actually orthologous) to one another. 
+
+When we do phylogenetic studies we are inevitably comparing many many sequences (and sometimes many genomes) to one another. That means everything has to be replicated for each sequence (or each genome), which can take a lot of time. In this example we will minimize this extra effort by using preprocessed data, using few species, and using few sequences.
+
+##***Part 3.1: Designing your experiment***
+
+The data you analyze and how you analyze it are going to be determined by your main questions. Phylogenetics is ultimately a way to understand evolutionary history of some group of individuals or species. The phylogenetic tree itself can be the end-goal or an analysis based on the evolutionary history can be the end goal.
+
+Below, define the end-goal of your phylogenetic experiment. You will need to decide the following information.
+
+Is your question about macro- or micro-evolution?
+What single-species or multi-species clade are you interested in studying?
+When you choose your species, do you want to cluster them in certain clades, or evenly sample all clades?
+What genes are best suited to analyze for your question (see recommendations below).
+Do you need to consider geographic sampling for your question?
+Do you need a single gene or multiple genes? If multiple is better do you want genes with similar rates or varying rates?
+
+Write your main question below and then discuss with Prof. Evangelista which genes might be best suited for your analysis.
+
+#####***Gene recommendations:***
+COI (cytochrome oxidase 1) mitochondrial gene: "the barcode gene". One of the most commonly sequenced genes. Fast evolving, so it has information content relevant to recent evolutionary history.
+
+COII mitochondrial gene: Same as COI except not sequenced quite as often.
+
+16s and 12s mitochondrial genes: both of these are similar to COI and COII in how they are used in phylogenetics. However, they may be sequenced less often. Neither of these code for DNA (ribosomeal RNA products) so they may be a bit more unweildly at later stages.
+
+18s nuclear gene: doesn't code for a protein (it codes for the RNA part of the ribosome) so it will be difficult to align. However, its evolutionary properties make it very useful for inferring medium (millions of years) and old (10-100's of millions of years) relationships. 
+
+28s nuclear gene d3 region: Similar to 18s but maybe better for even older relationships
+
+H3 (histone-3) nuclear gene: very slowly evolving so maybe only good for very old relationships
+
+ef1-alpha (elongation factor 1 alpha): slightly faster evolving than H3 but less commonly sequenced
+
+Genes for plants: Chloroplast genes are commonly used the same way mitochondrial genes are used for other Eukaryotes. That is because, in plants, Chloroplast DNA is more quickly evolving and the mitochondria is more slowly evolving.
+
+#####***Your experimental design***
+
+```{r}
+```
+Go to NCBI genbank (nucleotide search) and find 9 individuals (microevolution) or 5 species (macroevolution) from your clade of interest for the genes specified. Also find 9 outgroup samples. For each entry you find, you should find the FASTA formatted sequence and put the entire sequence into a text file (FASTA header and nucleotide sequence). Organize your data by gene. For example, if your gene names are c(COI, 16s, 12s) then you should have three files: COI.fasta, 16s.fasta, 12s.fasta. Each of your files should have up to 12 sequences in them (one from each sample) but if you have less that is ok (it is common for certain species to be lacking data for certain genes in GenBank).
+
+
+##***Part 3.2: Assesing homology***
+Now that you have your input files you need to assess their homology. Why? We already know that each file contains data from the same gene, so doesn't that mean those genes are homologous? In theory, yes. However, what we definitely don't know is the homology of the nucleotide sites. Since the sites are what we will be analyzing, that is what we need to make sure are homologous. Because of the specific of how we obtain DNA data (beyond the scope of this course) each sequence will not begin at the same spot along the gene. Also, insertion and deletion mutations could result in the genes being different lengths.
+
+We are going to assess homology using a program called MAFFT.
+
+First, install and load the ips package, which has mafft in it.
+
+```{r}
+```
+
+Now, load one gene into R using ape.
+
+```{r}
+```
+Now align it in mafft using the globalpair method, 2 cycles of iterative refinement, and the "--adjust direction" parameter. Then export the resulting alignment to a file.
+
+```{r}
+```
+
+Your sequences may or may not be aligned suitably. To check, download the software AliView (not an R software) and view the alignment in the GUI: https://ormbunkar.se/aliview/
+
+When viewing the alignment find areas with very poorly aligned regions. Poorly aligned regions are typically fast evolving...so fast evolving that they are usually much more detrimental to the analysis than beneficial, so it's best to remove them. Also, remove your "messy ends" by trimming the left-most and right-most characters such that end of the alignment is rectangular rather than ragged.
+
+After Prof. Evangelista checks your alignment you can reimport it into R below and realign it in MAFFT.
+
+```{r}
+```
+
+Save the output again and look at it in AliView now. Does it look better?
+
+##***Part 3.3: Choosing the best model***
+IQTree is one of the most versatile, thorough, effective, and easy-to-use phylogenetics software currently available. However, it isn't available in R. Since this class is more about learning R than learning phylogenetics we will do this phylogenetic reconstruction using the R-package phangorn. We have done this before actually, in a previous assignment. But now we're going to be much more thorough.
+
+NOTE: For using large and useful packages, it is often useful to have the PDF manual up: https://cran.r-project.org/web/packages/phangorn/phangorn.pdf
+
+```{r}
+```
+
+The first thing that IQTree can do is to choose the best model of evolution for any given gene. Let's do that first.
+
+Use function "modelTest" on each of your genes to find which model has the highest AIC score for that gene. To improve your test of the model you can supply a tree. A good option is to find a simple neighborjoining gene tree for that gene using the NJ() function.
+
+```{r}
+```
+
+##***Part 3.4: Tree searching***
+Once you have found the best model for each of your genes you are ready to do a partitioned phylogenetic analysis in phangorn using the functions multiphyDat2pmlPart() and some other preliminary functions. See the phangorn documentation for more details on how to do this.
+
+```{r}
+```
+
+Finding the right code for the above analysis might take a little while. You will probably get frustrated because it isn't as easy as it might first seem. My suggestion is to be patient, and use trial and error. If you encounter a problem try to check that your objects are in the right format/class. Then check your punctuation. If you don't see any errors in your code then try to google your error message. 
+
+If you can get a partitioned phylogenetic tree: congratulations! There is one more thing to do before we decide that this is the best topology to use.
+
+Building on the code you just wrote we are going to write an algorithm for finding the MAXIMUM LIKELIHOOD tree. You found the likelihood of a single tree above, but that probably isn't the tree with the MAXIMUM likelihood. In order to do that we need to (i) add a hueristic method for searching through tree space, (ii) iterate the ML calculation every time we alter the tree and (iii) implement a stopping criterion. 
+
+(i) Should be easy. All you need to do is to impliement one (or both) of the following functions: rNNI() and/or rSPR(). You should read what these functions do in the phangorn documentation. The only trick is to figure out where in the code block you should impliment them.
+
+I recommend that once you write suitable code that effectively outputs a rearranged tree and its likelihood that you store that code as a function. That way you can do the parts below much easier.
+
+```{r}
+```
+
+(ii) Could be a little more difficult. Now you have to iterate all of the above code through a loop. Try using for(){} as of now. There might be other loop controls more suitable for this task but let's keep it simple.
+
+```{r}
+```
+
+(ii) Now we have to put it all together and figure out how to get your beautiful new phylogeny program to stop when it thinks it has found the tree with the highest likelihood. Note that it may never find THE tree with the best likelihood, but we hope it will find a tree that is very similar to that "best" tree. 
+
+Within your loop you will need to implement some checkpoints. First, you will need a line that compares the likelihood of your new tree with the likelihood of the previous tree. Then you will need a line of code that stores whichever of those trees has the best likelihood score. Then you will need to implement some kind of switch that tells the software when the tree it has found is "good enough". Typically, phylogenetics software will do this by checking "if the likelihood score doesn't change after x (e.g. 10) iterations, then we should stop the search". Finally, you should implement a function that allows you to throw yourself out of the for loop. Even if the for loop hasn't finished, we want to stop it if the above stop criterion is met.
+
+```{r}
+```
+
+
+Were you able to do it?! If so, congratulations! You have built a Markov-Chain Monte-Carlo tree searching algorithm! If not, I am sure the biggest limitation was time. It might take a week of work to try and get your code right. If you haven't gotten it by now then we should move on to the last parts of a phylogenetic workflow. After-all, nearly everyone who makes phylogenetic trees will use premade programs and won't have to design their MCMC from the fundamental parts. You have already gone further than most professional phylogeneticists, even if your code doesn't work.
+
+##***Part 3.5: Assessing support for your tree***
+
+If you didn't find a maximum likelihood tree let's just use a parsimony tree using the function optim.parsimony().
+
+```{r}
+```
+
+Now you are going to randomly exclude some of the nucleotide data and rebuil your tree hundreds of times. This is a type of "bootstrap" analysis. Bootstrapping in phylogenetics is a way to use your data to assess statistical support for the model (the tree). It's called bootstrapping because you don't use outside data, you use your own data. So you are figuratively pulling yourself up with your bootstraps = you are assessing support for an assertion without collecting more data.
+
+Look in the phangorn documentation for how to do this. It's easier than it sounds using the built-in functionality of phangorn. You will end by using the plotBS() function to visualize your tree with the bootstrap frequencies on the branches.
+
+```{r}
+```
+
+
+Congratulations! You have made a statistically robust inference of evolutionary history! If this was 1995 the analysis you did would be good enough to publish ina very high-end journal. Nowadays you need to collect a lot more data (using genomics) and probably do some more testing to see how well all the parts of your model are working out. 
+
+We will stop here but you could keep going. You could figure out when all the speciation events in your tree happened (particularly if you have fossil data). You could use those dates to estimate the rate of speciation over time. This could tell you when there were accelerations in speciation rate (perhaps due to the origin of key adaptations) or decreases in speciation rate (perhaps due to mass extinctions). You could collect phenotypic data for your organisms and use an ancestral state reconstruction to see when, where, and with whom those phenotypic traits arose. You could record the geographic distribution of all of your species and track each one's spread across the globe over time. There are a panoply of things you can with phylogenies. Most of these things listed here you can do in R.
+

@@ -1,0 +1,241 @@
+---
+title: "Theming with bslib and thematic"
+output: 
+  html_document: 
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+if (requireNamespace("thematic")) 
+  thematic::thematic_rmd(font = "auto")
+library(ggplot2)
+```
+
+
+# Computational Ecology Part 2: Landscape image analysis
+### Prof. Dominic Evangelista - Adelphi University
+
+## Part 1: Intro
+
+With the ubiquity of satellite imagery and other remote sensing techniques like unmanned remote vehicles, and drones, analysis of images can be used for all sorts of applications. We can even extend this to analysis of videos, but we won't go that far in this course.
+
+Install and load the **ImageMagick** R library as well as some other useful packages.
+
+```{r}
+```
+You can find a good manual here: https://docs.ropensci.org/magick/articles/intro.html
+
+and here:
+
+https://rdrr.io/cran/magick/man/color.html
+
+NOTE: This manual introduces the pipe operator in r **%>%**. In fact, before writing this assignment workbook I had never heard of this functionality. By this point in the course you should be able to use simple functions from memory, so using the pipe operator to link them together can make it easier for you to write code more quickly (without having to go back and forth with parentheses).
+
+Now, download and install **Google Earth Pro**, which is offered free by Adelphi.
+
+As an example exercise, we are going to quantify deforestation of the Amazon over time. We need to obtain two images of the same exact area, one that is recent and another that is older. Let's say 20-40 years older. I will provide information to the images I am using but you should find your own images at a place of your choosing. As long as the place has some kind of human habitation or influence visible at the satellite scale. Remember to turn off things like labels, atmosphere, water surface, and sun but turn ON historical imagery.
+
+My image location: https://earth.google.com/web/@-12.71171371,-69.41104039,67006.62313922a,0d,35y,-0.2924h,0.0000t,0.0000r/data=ChAqDggBEgoyMDIxLTA4LTEx?utm_source=earth7&utm_campaign=vine&hl=en
+
+I am taking my images from 12/2020, 12/2000, and 12/1990
+
+## Part 2: Basic image analysis functions
+
+First, import your image.
+```{r}
+```
+
+Now try some basic manipulations of your image.
+
+### 1. Scale the image down to 500 pixel width
+```{r Scale}
+#Scale the image down to 500 pixel width
+
+
+```
+### 2. Increase the color saturation
+```{r Saturation}
+#Increase the color saturation
+
+
+```
+
+### 3. Convert to grayscale
+```{r}
+```
+
+### 4. Blur the image
+```{r}
+```
+   
+### 5. Make the lines/edges stand out
+```{r}
+```
+
+### 6. Make a GIF showing the change over time.
+```{r}
+```
+
+
+### 7. Extract the red color channel
+```{r}
+```
+
+### 8. Subtract two images
+```{r}
+```
+
+
+
+## Part 3: Quantifying deforestation
+
+The basic idea of this kind of image analysis is to replicate what we are doing with our eyes+brains with code. In looking at the satellite images we know where the deforestation is because sighted humans are good at seeing visual patterns. It is useful to think about what visual patterns we are picking out when we determine that one area has more deforestation than the next.
+
+Brainstorm on what visual elements signal to us that there is more (or less) anthropogenic deforestation. List them below (NOTE: Don't look ahead in the document, there will be spoilers. Make your list first.)
+  * 1. 
+  * 2. ...
+
+We will see how many of these we can use to quantify deforestation among these images.
+
+
+
+### Method 1
+
+Perhaps the simpliest method is to simply look at the colors in an image...
+
+#### Green 1990
+```{r}
+```
+#### Red 1990
+```{r}
+```
+#### Blue 1990
+```{r}
+```
+
+#### Green 2000 and 2020
+```{r}
+```
+
+And now we can compare between the three time periods...
+
+```{r}
+```
+
+Clearly there is a problem. We know, from looking at the photos, that there is increasing deforestation over time. One of the reasons we know this is that the green color of the forest is being replaced by the browns and yellows of soil. 
+
+However, our way of analyzing this is over-simplification that ignores a lot of the other variation in the photos. There's weather variation (maybe 2000 and 1990 were cloudier on the day they took the photos), there's seasonal variation (maybe December was wetter in 2020 than it was in 1990 or 2000), there's technological variation (different camera types year to year), and maybe more. 
+
+We need to control for this variation by doing some preprocessed filtering.
+
+
+
+
+### Method 2
+
+Let's keep the same goal as before (quantify the amount of green) but simplify the images first so that our result is more similar to what we expect it to be.
+
+Part of the problem is that there is noise in the images. The forests aren't homogenously green and the other areas aren't homogeneous either. We can reduce this noise by applying a dilation or noise-reducing filter.
+
+```{r noise reduction}
+noiseRed1990<-AmazonMDD1990 %>%
+image_enhance %>% #applies a noise reducing filter
+image_median(radius = 5)  %>% #smooths the colors
+image_morphology('Dilate', "Diamond") #takes small elements and makes them larger. Note, this should be done after reducing noise
+  
+noiseRed1990
+
+```
+Although the image has overall lower quality, the elements that are important to us are much more simply represented. However, the lines between the deforested and forested areas are a bit blurred. Let's emphasize those differences by increasing the contrast and saturation.
+
+```{r}
+```
+Turn this into a function and apply it to all three time periods.
+
+```{r}
+```
+
+
+```{r}
+```
+
+This still didn't work, although maybe these filtering steps are still useful. Let's take these images and adjust colors that are above or below a certain threshold.
+
+```{r}
+```
+Now we can use some more complex filters to make the color differences even more exaggerated.
+
+```{r}
+```
+
+Now apply these methods to each image in turn. 
+```{r}
+```
+
+
+...and make a gif of the result...
+
+```{r}
+```
+
+You will find that the results are probably not perfectly consistent. This is probably occurring before the stages that rely on the histogram of colors to split up the image. You could do some more filtering to perfect this. Try it out if you like. However, we will now move on to the final step.
+
+Let's now see if we can quantify the amount of forest versus non-forest.
+
+```{r}
+```
+
+According to this the amount of deforestation has increased significantly since 2000. Does that match up with what the original Google Earth images  tell our eyes?
+
+This pattern may be driven by an increase in gold mining in the last 20 years (https://www.arcgis.com/apps/Cascade/index.html?appid=bea728c6dedb41b1ac8ac606e6e33855). You can see that not only are there farms and other developments expanding from the main road but also there is much destruction surrounding the Madre De Dios river as well, likely caused by gold mining.
+
+A final note: You may be wondering why we went through all this trouble to replicate something with code that we could easily tell with our eyes. There are two important reasons:
+  * scalability
+  * quantitation
+
+Although we can easily compare three satellite images of the same region there are millions of similar images and analyzing them by eye would be impractical, if not impossible. And obviously if we analyze them by eye we cannot get quantifiable data. Once we have code that can automatically quantify things like deforestation then we can use that data to do new things. List some ways we could use this data below:
+  *
+  *
+  *
+
+
+
+### Method 3
+
+The final way we can attempt to do this may not be possible, but we'll try anyway. Nature rarely forms straight lines but humans form straight lines all the time. Below, attempt to use Image Magick's **edge detection** and other morphology functions to quantify the straight edges in the original photo graphs. This has the disctinct advantage of allowing us to distinguish between land development and mining, since these types of mines will follow the curves of waterways.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
