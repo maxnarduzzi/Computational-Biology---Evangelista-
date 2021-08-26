@@ -6,6 +6,78 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+##**Numbers in R**
+
+Let's go through some simple operations on numbers and see what it tells us about how R works.
+
+Let's make some example numbers to work with.
+
+vectorA <- c(0, 1, 2, 10, 2.5, 1/3, pi)
+
+```{r}
+```
+Notice how we put in whole numbers but it returns the real number equivalent of the numbers we put in. Same for the fractions and the irrational number, pi.
+
+What if we wanted to add the 2nd and 3rd value in the vector together. How could we do that? See how many different ways you could accomplish that using different methods in the code block below.
+
+```{r}
+```
+Notice how the result you get is a whole number, NOT a real number. Or is it? How can we be sure? Find out what class the numbers are stored as and what storage mode they are.
+
+
+```{r}
+```
+We can redefine our list to contain integers by place "L" after the integer. Do this and then check that it worked.
+
+```{r}
+```
+There may be some cases where we want a specific part of a number. Maybe we want to round to the nearest whole number, or we only want the decimal part of a number. Using the original version of vectorA, do each of these with the real numbers. See how many different methods you can come up with.
+
+
+```{r}
+```
+
+One thing you might want to do often is use a random number. Interestingly is no simple way to get a truly random number. However we can get a pseudo-random number. There are a few ways one might do this. Find some simple methods to generate random numbers and in the box below generate a random digit, a random number between 1 and 9999, and a random number between 0 and 1.
+
+
+```{r}
+```
+
+Finally, there are many mathematical operations you can do with built-in symbols in r. Transform our vector using some common mathematical operations below.
+
+```{r}
+```
+
+
+##**Strings in R**
+
+In computer science a "string" referrs to a sequence of text characters (i.e. text). This is not the same as what "strings" are in physics. Strings are surprisingly important objects that you will need to manipulate in this class. Our names of variables will be strings, DNA, RNA or protein sequences are strings, and lots of other data types can start off as strings. Understanding how to manipulate strings is important for parsing through text files which might have important information in them.
+
+Let's use the example string below from Lord of the Rings.
+
+poem <- {"     Three Rings for the Elven-kings under the sky,
+Seven for the dwarf-lords in their halls of stone,
+Nine for Mortal Men doomed to die,
+One for the Dark Lord on his dark throne..."}
+
+In the code block below do the following...
+  * Print the poem without the white-space at the beginning
+  * Print the poem without the ellipses (...) at the end
+  * Return the second line only
+  * Return the poem in a single line (without line breaks)
+  * Remove all the whitespace
+  * Find all the positions of the letter "o"
+  * Make a single string that combines the first and last lines only
+  * Count how many words are in the poem
+  * Convert the poem to a list of words
+  * make a histogram of all the words and how often they appear
+
+```{r}
+```
+
+##**Some more tutorials**
+
+
 
 Visit: https://github.com/stacycalhoun/Intro_to_R_in_Ecology_Resources
 
